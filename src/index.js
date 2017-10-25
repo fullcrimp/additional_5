@@ -1,5 +1,6 @@
 module.exports = function check(str, bracketsConfig) {
-  // decare dictionaries
+  
+  // decare bracket dictionaries
   let openBracketDict = bracketsConfig.map(item => item[0]),
     closeBracketDict = bracketsConfig.map(item => item[1])
 
@@ -12,46 +13,24 @@ module.exports = function check(str, bracketsConfig) {
       isCloseBracket = closeBracketIndex > -1,
       isUniBracket = isCloseBracket && isOpenBracket
 
-    // stack has smth and the case of the unibracket
-    if (stack.length && isUniBracket) {
-      // '...||' CLOSED GROUP: REMOVE FROM STACK 
-      if (closeBracketIndex === stack[stack.length - 1]) {
-        stack.pop()
-        str = str.substring(1)
-        continue
+    
+    if (isUniBracket) { // stack has smth and the case of the unibracket
 
-        // '...(|' 
+      if (closeBracketIndex === stack[stack.length - 1]) { // closing uni-bracket - remove from stack last occurence 
+        stack.pop()        
       } else {
-        stack.push(closeBracketIndex)
-        str = str.substring(1)
-        continue
+        stack.push(closeBracketIndex) // add to stack a new occurence of uni-bracket
       }
-    }
 
-    // '...('
-    if (isOpenBracket) {
-      stack.push(openBracketIndex)
-      str = str.substring(1)
-      continue
-    }
+    } else { 
+      // '...('
+      if (isOpenBracket)  stack.push(openBracketIndex) // add to stack opening bracket
 
-    // '...)'
-    if (isCloseBracket) {
-      // '...[]'
-      if (closeBracketIndex === stack.pop()) {
-        str = str.substring(1)
-
-        // '...(]' WRONG 
-      } else {
-        return false
-      }
+      if (isCloseBracket && closeBracketIndex !== stack.pop()) return false // unexpected closing bracket - WRONG SEQUENCE
     }
+    str = str.substring(1)
   }
 
-  // str fully processed
-  if (stack.length) {
-    return false
-  } else {
-    return true
-  }
+  // str fully processed: if smth still in stack - some brackets not closed
+  return  stack.length ? false : true
 }
