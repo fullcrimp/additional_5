@@ -24,9 +24,16 @@ module.exports = function check(str, bracketsConfig) {
 
     } else { 
       // '...('
-      if (isOpenBracket)  stack.push(openBracketIndex) // add to stack opening bracket
+      if (isOpenBracket) stack.push(openBracketIndex) // add to stack opening bracket
 
-      if (isCloseBracket && closeBracketIndex !== stack.pop()) return false // unexpected closing bracket - WRONG SEQUENCE
+      // longer but more readable than if (isCloseBracket && closeBracketIndex !== stack.pop()) return false
+      if (isCloseBracket) {
+        if (closeBracketIndex === stack[stack.length - 1]) { 
+          stack.pop()
+        } else {
+          return false // unexpected closing bracket - WRONG SEQUENCE
+        }
+      }      
     }
     str = str.substring(1)
   }
